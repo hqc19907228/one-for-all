@@ -1,28 +1,37 @@
-# Render Engine turns Schema into real UI
-
-Use [Schema](https://github.com/quanxiang-cloud/one-for-all/blob/main/packages/schema-spec/src/index.d.ts) to describe your web page logic,
-then use Render Engine to make it into real UI.
+# Artery Renderer
 
 [中文文档](docs/zh/index.md)
 
-## Get Start
+AKA render engine, render [Artery](https://github.com/quanxiang-cloud/one-for-all/tree/main/packages/artery) into read UI.
 
-Install render engine use npm or yarn:
+TL;DR;
+
+- Artery Renderer is a implementation of MVC
+- Artery Renderer uses React and RxJS to implement View and Model
+- Artery Renderer is extremely extensible, you can implement plug-ins as needed
+
+- Usage
+- How Artery Renderer works
+- FAQ
+
+## Quick Start
+
+Install by npm or yarn:
 
 ```bash
-npm install @one-for-all/render-engine
+npm install @one-for-all/artery-renderer
 ```
 
 Import render engine in your source file:
 
 ```jsx
 import React from 'react';
-import { RefLoader, Repository, SchemaRender } from '@one-for-all/render-engine';
+import { RefLoader, Repository, ArteryRenderer } from '@one-for-all/artery-renderer';
 
 function Demo() {
-  const schema = getSchemaBySomeway();
+  const artery = getArteryBySomeway();
 
-  return (<SchemaRender schema={schema} />);
+  return (<ArteryRenderer artery={artery} />);
 }
 
 ```
