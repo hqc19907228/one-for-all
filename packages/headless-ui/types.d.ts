@@ -195,7 +195,7 @@ interface CascaderOptionType {
   children?: CascaderOptionType[];
 }
 
-type PopupPlacement = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+type PopupPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end';
 
 interface FilledFieldNamesType {
   value: NumberString;
@@ -581,4 +581,34 @@ interface BreadcrumbProps extends BaseProps {
   segmentRender?: SegmentRenderType;
   segmentClass?: string;
   segmentStyle?: React.CSSProperties;
+}
+
+type DatePickerValueType = Date | string;
+type DatePickerModeType = 'time' | 'date' | 'month' | 'quarter' | 'year';
+type DatePickerTimeScopeType = 'hour' | 'minute' | 'second';
+interface DatePickerProps extends BaseProps {
+  defaultValue?: DatePickerValueType;
+  value?: DatePickerValueType;
+  disabled?: boolean;
+  popupClassName?: string;
+  popupStyle?: React.CSSProperties;
+  placeholder?: string;
+  inputReadOnly?: boolean;
+  showToday?: boolean;
+  showNow?: boolean;
+  timeScope?: DatePickerTimeScopeType;
+  placement?: PopupPlacement;
+  mode?: DatePickerModeType;
+  nextIcon?: React.ReactNode;
+  prevIcon?: React.ReactNode;
+  superNextIcon?: React.ReactNode;
+  superPrevIcon?: React.ReactNode;
+  suffixIcon?: React.ReactNode;
+  format?: ((date: Date) => string) | string;
+  dateRender?: (currentDate: Date, pickDate: Date) => React.ReactNode; // no
+  disabledDate?: (currentDate: Date) => boolean; // no
+  panelRender?: (panel: React.ReactNode) => React.ReactNode; // no
+  onOpenChange?: (open: boolean) => void; // no
+  onChange?: (date: Date) => void; // no
+  onPanelChange?: () => void; // no
 }
