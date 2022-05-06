@@ -163,17 +163,19 @@ export default function DatePickerPanel({
       )}
       {TimeHeader}
       {TimePicker}
-      <div className="ofa-date-picker-footer">
-        {hasPickTime() && (
+      {hasPickTime() && (
+        <div className="ofa-date-picker-footer">
           <div className="ofa-date-confirm-time">
             <button onClick={() => onChangePicker?.(pickedDate)}>确定</button>
             {showNow && <span className="ofa-date-picker-text-button" onClick={() => onChangePicker?.(dayjs())}>此刻</span>}
           </div>
-        )}
-        {showToday && pickScope === 'date' && !timeScope && (
+        </div>
+      )}
+      {showToday && pickScope === 'date' && !timeScope && (
+        <div className="ofa-date-picker-footer">
           <span className="ofa-date-picker-text-button" onClick={() => onChangePicker?.(dayjs())}>今天</span>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
