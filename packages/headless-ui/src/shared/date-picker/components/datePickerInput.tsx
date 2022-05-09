@@ -13,8 +13,8 @@ interface Props {
   suffixIcon?: React.ReactNode;
   mode: DatePickerModeType;
   format?: ((date: Date) => string) | string;
-  timeScope?: DatePickerTimeScopeType;
-  onChangeInput?: (date: Dayjs) => void;
+  timeAccuracy?: DatePickerTimeAccuracyType;
+  onChangeInput?: (date: Dayjs) => boolean;
   onClick?: (e: React.MouseEvent) => void;
   onBlur?: () => void;
   onClear?: () => void;
@@ -29,11 +29,11 @@ function DatePickerInput(
     suffixIcon,
     mode,
     format,
-    timeScope,
+    timeAccuracy,
     onChangeInput,
     onBlur,
     onClick,
-    onClear
+    onClear,
   }: Props,
   ref?: Ref<HTMLDivElement>,
 ) {
@@ -56,7 +56,10 @@ function DatePickerInput(
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.keyCode !== 13) return;
     if (inputValue && isLegalDate(inputValue, mode)) {
-      onChangeInput?.(dayjs(transformDate(inputValue, mode)));
+      const inputDate = dayjs(transformDate(inputValue, mode));
+      if (onChangeInput?.(inputDate) === false) {
+        setInputValue(formatDate(date));
+      }
     } else {
       setInputValue(formatDate(date));
     }
@@ -74,7 +77,7 @@ function DatePickerInput(
     }
   
     let formatStr = defaultFormatMap[mode];
-    if (mode === 'date' && timeScope) {
+    if (mode === 'date' && timeAccuracy) {
       formatStr = 'YYYY-MM-DD HH:mm:ss';
     }
   

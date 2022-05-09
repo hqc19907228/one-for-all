@@ -585,7 +585,7 @@ interface BreadcrumbProps extends BaseProps {
 
 type DatePickerValueType = Date | string;
 type DatePickerModeType = 'time' | 'date' | 'month' | 'quarter' | 'year';
-type DatePickerTimeScopeType = 'hour' | 'minute' | 'second';
+type DatePickerTimeAccuracyType = 'hour' | 'minute' | 'second';
 interface DatePickerProps extends BaseProps {
   defaultValue?: DatePickerValueType;
   value?: DatePickerValueType;
@@ -594,9 +594,8 @@ interface DatePickerProps extends BaseProps {
   popupStyle?: React.CSSProperties;
   placeholder?: string;
   inputReadOnly?: boolean;
-  showToday?: boolean;
-  showNow?: boolean;
-  timeScope?: DatePickerTimeScopeType;
+  hiddenPresent?: boolean;
+  timeAccuracy?: DatePickerTimeAccuracyType;
   placement?: PopupPlacement;
   mode?: DatePickerModeType;
   nextIcon?: React.ReactNode;
@@ -605,10 +604,9 @@ interface DatePickerProps extends BaseProps {
   superPrevIcon?: React.ReactNode;
   suffixIcon?: React.ReactNode;
   format?: ((date: Date) => string) | string;
-  dateRender?: (currentDate: Date, pickDate: Date) => React.ReactNode; // no
-  disabledDate?: (currentDate: Date) => boolean; // no
-  panelRender?: (panel: React.ReactNode) => React.ReactNode; // no
-  onOpenChange?: (open: boolean) => void; // no
-  onChange?: (date: Date) => void; // no
-  onPanelChange?: () => void; // no
+  dateRender?: (currentDate: Date, pickDate: Date | undefined) => React.ReactNode; // no
+  disabledDate?: (date: Date) => boolean;
+  disabledTime?: (type: DatePickerTimeAccuracyType, time: number) => boolean;
+  onOpenChange?: (open: boolean) => void;
+  onChange?: (date: Date | undefined) => void;
 }

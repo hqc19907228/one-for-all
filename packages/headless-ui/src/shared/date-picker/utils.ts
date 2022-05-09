@@ -1,4 +1,7 @@
 import dayjs, { Dayjs } from "dayjs";
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+
+dayjs.extend(quarterOfYear);
 
 export type DateType = {
   value: number;
@@ -9,6 +12,8 @@ export type DateType = {
 };
 
 export type QuarterType = 'Q1' | 'Q2' | 'Q3' | 'Q4';
+
+export type PickScope = '' | 'time' | 'date' | 'month' | 'quarter' | 'year' | 'century';
 
 export const defaultFormatMap: {[key in DatePickerModeType]: string} = {
   'time': 'HH:mm:ss',
@@ -26,7 +31,7 @@ export function transformDate(dateStr: string, mode: DatePickerModeType): string
   let transformDate = dateStr;
   const matchStr = dateStr.match(/Q\d/)?.[0];
   if (matchStr) {
-    transformDate = transformDate.replace(matchStr, '' + getStartMonthOfQuarter(matchStr as QuarterType));
+    transformDate = transformDate.replace(matchStr, '' + (getStartMonthOfQuarter(matchStr as QuarterType)) + 1);
   }
   if (mode === 'time') {
     transformDate = dayjs().format('YYYY-MM-DD') + ' ' + transformDate;
@@ -75,23 +80,19 @@ export function getStartYear(date: Dayjs, type: 'ten_years' | 'century'): number
 }
 
 export function getQuarterByMonth(month: number): QuarterType {
-  if (month < 3) return 'Q1';
-  if (month < 6) return 'Q2';
-  if (month < 9) return 'Q3';
-  return 'Q4';
+  return `Q${dayjs().month(month).quarter()}` as QuarterType;
 }
 
 export function getStartMonthOfQuarter(quarter: QuarterType): number {
-  return {
-    'Q1': 1,
-    'Q2': 4,
-    'Q3': 7,
-    'Q4': 10
-  }[quarter];
+  return dayjs().quarter(Number(quarter.replace('Q', ''))).startOf('quarter').month();
 }
 
-export function getDate(): Dayjs {
-  return dayjs().set('hour', 0).set('minute', 0).set('second', 0);
+export function getDate(mode: PickScope, timeAccuracy: DatePickerTimeAccuracyType | undefined): Dayjs {
+  if (timeAccuracy) return dayjs().startOf(timeAccuracy);
+  if (mode === '') return dayjs().startOf('date');
+  if (mode === 'time') return dayjs().startOf('second');
+  if (mode === 'century') return dayjs().startOf('year');
+  return dayjs().startOf(mode);
 }
 
 export function scrollTo(dom: HTMLElement, location: number, delay?: number): void {
