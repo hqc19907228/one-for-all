@@ -1,11 +1,5 @@
-import {
-  merge,
-  fromEvent,
-  BehaviorSubject,
-  Subject,
-  Subscription,
-} from 'rxjs';
-import { map, audit, debounceTime, tap, distinctUntilChanged } from 'rxjs/operators';
+import { merge, fromEvent, BehaviorSubject, Subject, Observable } from 'rxjs';
+import { map, audit, tap, distinctUntilChanged } from 'rxjs/operators';
 
 import { calcRect, isSame } from './utils';
 import type { Report, Rect, ElementRect } from './type';
@@ -36,25 +30,34 @@ export default class Radar {
       }, 150);
     });
 
-    const scrollSign$ = scroll$.pipe(
-      audit(() => scrollDone$),
-    );
+    const scrollSign$ = scroll$.pipe(audit(() => scrollDone$));
 
     this.resizeObserver = new ResizeObserver(this.onResize);
     this.resizeObserver.observe(this.root);
 
-    merge(scrollSign$, this.targets$, this.resizeSign$).pipe(
-      debounceTime(100),
-      // debounce(() => animationFrames()),
-      // auditTime(150),
-      tap(() => {
-        this.visibleObserver.disconnect();
-      }),
-    ).subscribe(() => {
-      this.targets$.value.forEach((ele) => {
-        this.visibleObserver.observe(ele);
+    this.targets$.subscribe((targets) => {
+      this.resizeObserver.disconnect();
+      this.resizeObserver.observe(this.root);
+
+      targets.forEach((target) => {
+        this.resizeObserver.observe(target);
       });
     });
+
+    merge(scrollSign$, this.targets$, this.resizeSign$)
+      .pipe(
+        // auditTime(100),
+        // debounce(() => animationFrames()),
+        // auditTime(150),
+        tap(() => {
+          this.visibleObserver.disconnect();
+        }),
+      )
+      .subscribe(() => {
+        this.targets$.value.forEach((ele) => {
+          this.visibleObserver.observe(ele);
+        });
+      });
   }
 
   private onResize = (): void => {
@@ -62,9 +65,12 @@ export default class Radar {
   };
 
   private intersectionObserverCallback = (entries: IntersectionObserverEntry[]): void => {
+    this.report = new Map<HTMLElement, ElementRect>();
     entries.forEach(({ target, boundingClientRect, rootBounds, isIntersecting }) => {
-      const relativeRect: Rect = calcRect(boundingClientRect, rootBounds);
-      this.report.set(target as HTMLElement, { relativeRect, raw: boundingClientRect, visible: isIntersecting });
+      if (isIntersecting) {
+        const relativeRect: Rect = calcRect(boundingClientRect, rootBounds);
+        this.report.set(target as HTMLElement, { relativeRect, raw: boundingClientRect });
+      }
     });
 
     this.reportUpdatedSign$.next();
@@ -83,23 +89,15 @@ export default class Radar {
     this.targets$.next(elements);
   }
 
-  public listen(listener: (report: Report) => void): Subscription {
+  public getReport$(): Observable<Report> {
     return this.reportUpdatedSign$.pipe(
       map(() => {
+        // todo optimize this of making copy
         const newReport: Report = new Map();
-        this.report.forEach((value, key) => {
-          if (value.visible) {
-            newReport.set(key, value);
-          }
-        });
-
+        this.report.forEach((value, key) => newReport.set(key, value));
         return newReport;
       }),
       distinctUntilChanged(isSame),
-    ).subscribe(listener);
-  }
-
-  public unListen(subscription: Subscription): void {
-    subscription.unsubscribe();
+    );
   }
 }
