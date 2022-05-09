@@ -12,6 +12,7 @@ import Switch from '../shared/switch';
 import Tab from '../shared/tab';
 import Table from '../shared/table';
 import Tag from '../shared/tag';
+import DatePicker from '../shared/date-picker';
 import usePopper from '../shared/popper';
 
 import '../css/index.css';
@@ -33,5 +34,6 @@ export {
   Tab,
   Table,
   Tag,
+  DatePicker,
   usePopper,
 };
