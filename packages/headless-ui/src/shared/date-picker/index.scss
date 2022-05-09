@@ -27,7 +27,7 @@
 
 .ofa-date-picker-panel {
   margin-top: 4px;
-  padding-bottom: 10px;
+  background-color: #fff;
   box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%), 0 9px 28px 8px rgb(0 0 0 / 5%);
   .ofa-date-picker-header {
     display: flex;
@@ -92,10 +92,10 @@
   }
   .ofa-date-picker-footer {
     text-align: center;
-    padding: 10px 10px 0;
     border-top: 1px solid #d9d9d9;
     .ofa-date-picker-common-footer {
       position: relative;
+      padding: 10px;
       .ofa-date-picker-text-button {
         float: left;
       }

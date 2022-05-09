@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import cs from 'classnames';
 
@@ -19,6 +19,13 @@ export default function RenderQuarterPicker({
   onChange,
   disabledDate,
 }: Props): JSX.Element {
+  const quarter = useMemo(() => {
+    return QUARTER.map(curQuarter => ({
+      value: curQuarter,
+      isDisabled: !!disabledDate?.(date.clone().set('month', getStartMonthOfQuarter(curQuarter)).toDate()),
+    }));
+  }, [date.year()]);
+
   function handleChangeMonth(quarter: QuarterType): void {
     const startMonth = getStartMonthOfQuarter(quarter);
     onChange?.(date.month(startMonth));
@@ -26,25 +33,25 @@ export default function RenderQuarterPicker({
 
   return (
     <div className="ofa-pick-quarter">
-      {QUARTER.map(curQuarter => {
-        if (disabledDate?.(date.clone().set('month', getStartMonthOfQuarter(curQuarter)).toDate())) {
+      {quarter.map(({ value, isDisabled }) => {
+        if (isDisabled) {
           return (
             <span
               className="ofa-pick-item is-disabled"
-              key={curQuarter}
-            >{curQuarter}</span>
+              key={value}
+            >{value}</span>
           );
         }
         return (
           <span
             className={cs(
               'ofa-pick-item',
-              getQuarterByMonth(dayjs().month()) === curQuarter && 'is-today',
-              pickedDate && getQuarterByMonth(pickedDate.month()) === curQuarter && 'is-selected',
+              getQuarterByMonth(dayjs().month()) === value && 'is-today',
+              pickedDate && getQuarterByMonth(pickedDate.month()) === value && 'is-selected',
             )}
-            key={curQuarter}
-            onClick={() => handleChangeMonth(curQuarter)}
-          >{curQuarter}</span>
+            key={value}
+            onClick={() => handleChangeMonth(value)}
+          >{value}</span>
         );
       })}
     </div>

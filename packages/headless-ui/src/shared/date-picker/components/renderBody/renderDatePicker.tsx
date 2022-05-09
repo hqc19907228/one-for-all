@@ -20,8 +20,8 @@ export default function RenderDatePicker({
   disabledDate,
 }: Props): JSX.Element {
   const dates = useMemo(() => {
-    return getDatesOfMonth(date);
-  }, [date]);
+    return getDatesOfMonth(date, disabledDate);
+  }, [date.year(), date.month()]);
   
   function isSameDate(baseDate: Dayjs | undefined, { relativeMonth, value }: DateType): boolean {
     return !!baseDate?.isSame(date.add(relativeMonth, 'month').set('date', value), 'date');
@@ -38,7 +38,7 @@ export default function RenderDatePicker({
       ))}
       {dates.map((curDate) => {
         const { value, relativeMonth } = curDate;
-        if (disabledDate?.(date.add(relativeMonth, 'month').set('date', value).toDate())) {
+        if (curDate.disabled) {
           return (
             <span
               className="ofa-pick-item is-disabled"

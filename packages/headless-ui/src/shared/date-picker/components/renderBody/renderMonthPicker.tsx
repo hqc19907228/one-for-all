@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import cs from 'classnames';
 
@@ -17,6 +17,13 @@ export default function RenderMonthPicker({
   onChange,
   disabledDate,
 }: Props): JSX.Element {
+  const month = useMemo(() => {
+    return MONTH.map(curMonth => ({
+      value: curMonth,
+      isDisabled: !!disabledDate?.(date.clone().set('month', curMonth).toDate())
+    }));
+  }, [date.year()]);
+
   function handleChangeMonth(month: number): void {
     onChange?.(date.month(month));
   }
@@ -27,25 +34,25 @@ export default function RenderMonthPicker({
 
   return (
     <div className="ofa-pick-month">
-      {MONTH.map(curMonth => {
-        if (disabledDate?.(date.clone().set('month', curMonth).toDate())) {
+      {month.map(({ value, isDisabled }) => {
+        if (isDisabled) {
           return (
             <span
               className="ofa-pick-item is-disabled"
-              key={curMonth}
-            >{curMonth + 1}月</span>
+              key={value}
+            >{value + 1}月</span>
           );
         }
         return (
           <span
             className={cs(
               'ofa-pick-item',
-              isSameMonth(dayjs(), curMonth) && 'is-today',
-              isSameMonth(pickedDate, curMonth) && 'is-selected',
+              isSameMonth(dayjs(), value) && 'is-today',
+              isSameMonth(pickedDate, value) && 'is-selected',
             )}
-            key={curMonth}
-            onClick={() => handleChangeMonth(curMonth)}
-          >{curMonth + 1}月</span>
+            key={value}
+            onClick={() => handleChangeMonth(value)}
+          >{value + 1}月</span>
         )
       })}
     </div>

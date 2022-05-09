@@ -260,6 +260,10 @@ export const Time = Template.bind({});
 Time.args = {
   defaultValue: '10:09:10',
   mode: 'time',
+  disabledTime(type, time) {
+    if (type === 'hour') return [3,5,7].includes(time);
+    return false;
+  }
 }
 
 export const formatCustom = Template.bind({});

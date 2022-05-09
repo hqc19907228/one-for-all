@@ -21,6 +21,8 @@ export default function CommonFooter({
     onPickPresent?.();
   }
 
+  if (!onPickPresent && !onConfirm) return <></>;
+
   return (
     <div className="ofa-date-picker-common-footer">
       {onPickPresent && <span

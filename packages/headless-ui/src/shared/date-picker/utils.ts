@@ -39,7 +39,7 @@ export function transformDate(dateStr: string, mode: DatePickerModeType): string
   return transformDate;
 }
 
-export function getDatesOfMonth(date: Dayjs): DateType[] {
+export function getDatesOfMonth(date: Dayjs, disabledDate?: (date: Date) => boolean): DateType[] {
   const startDate = date.startOf('month').date();
   const endDate = date.endOf('month').date();
   const beforeMonthLastDate = date.subtract(1, 'month').endOf('month').date();
@@ -52,7 +52,7 @@ export function getDatesOfMonth(date: Dayjs): DateType[] {
     dates.push({
       value: beforeMonthLastDate - i + 1,
       relativeMonth: -1,
-      disabled: true,
+      disabled: disabledDate?.(date.subtract(1, 'month').set('date', beforeMonthLastDate - i + 1).toDate()),
     });
   }
   
@@ -60,6 +60,7 @@ export function getDatesOfMonth(date: Dayjs): DateType[] {
     dates.push({
       value: i,
       relativeMonth: 0,
+      disabled: disabledDate?.(date.clone().set('date', i).toDate()),
     });
   }
 
@@ -67,7 +68,7 @@ export function getDatesOfMonth(date: Dayjs): DateType[] {
     dates.push({
       value: i - endDay + 1,
       relativeMonth: 1,
-      disabled: true,
+      disabled: disabledDate?.(date.add(1, 'month').set('date', i - endDay + 1).toDate()),
     });
   }
   return dates;
@@ -103,13 +104,13 @@ export function scrollTo(dom: HTMLElement, location: number, delay?: number): vo
 
   const times = Math.ceil((delay || 600) / 60);
   const speed = (location - dom.scrollTop) / times;
-  function scrollTimes(dom: HTMLElement, location: number, speed: number, times: number): void {
+  function scrollByTimes(dom: HTMLElement, location: number, speed: number, times: number): void {
     if (times <= 0) {
       dom.scrollTop = location;
       return;
     }
     dom.scrollTop += speed;
-    requestAnimationFrame(() => scrollTimes(dom, location, speed, times - 1));
+    requestAnimationFrame(() => scrollByTimes(dom, location, speed, times - 1));
   }
-  requestAnimationFrame(() => scrollTimes(dom, location, speed, times));
+  requestAnimationFrame(() => scrollByTimes(dom, location, speed, times));
 }

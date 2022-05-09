@@ -18,8 +18,11 @@ export default function RenderYearPicker({
   const years = useMemo(() => {
     const year = date.get('year');
     const startYear = year - year % 10;
-    return (new Array(12).fill(1)).map((val, index) => startYear + index - 1);
-  }, [date]);
+    return (new Array(12).fill(1)).map((val, index) => ({
+      value: startYear + index - 1,
+      isDisabled: !!disabledDate?.(date.clone().set('year', startYear + index - 1).toDate())
+    }));
+  }, [date.year()]);
   
   function handleChangeYear(year: number): void {
     onChange?.(date.year(year));
@@ -27,26 +30,26 @@ export default function RenderYearPicker({
 
   return (
     <div className="ofa-pick-year">
-      {years.map((curYear, index) => {
-        if (disabledDate?.(date.clone().set('year', curYear).toDate())) {
+      {years.map(({value, isDisabled}, index) => {
+        if (isDisabled) {
           return (
             <span
               className="ofa-pick-item is-disabled"
-              key={curYear}
-            >{curYear}年</span>
+              key={value}
+            >{value}年</span>
           );
         }
         return (
           <span
             className={cs(
               'ofa-pick-item',
-              dayjs().year() === curYear && 'is-today',
-              pickedDate?.year() === curYear && 'is-selected',
+              dayjs().year() === value && 'is-today',
+              pickedDate?.year() === value && 'is-selected',
               [0, years.length - 1].includes(index) && 'is-other-panel',
             )}
-            key={curYear}
-            onClick={() => handleChangeYear(curYear)}
-          >{curYear}年</span>
+            key={value}
+            onClick={() => handleChangeYear(value)}
+          >{value}年</span>
         )
       })}
     </div>

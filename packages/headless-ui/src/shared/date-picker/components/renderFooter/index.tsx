@@ -84,7 +84,7 @@ export default function RenderFooter({
     <CommonFooter
       disabledPresent={isDisabledPresent('year')}
       onPickPresent={hiddenPresent ? undefined : () => handlePickPresent('year', mode === 'quarter' ? 'quarter' : 'month')}
-      presentText="当前年"
+      presentText="今年"
     />
   );
 

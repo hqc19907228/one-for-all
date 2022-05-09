@@ -152,8 +152,8 @@ ref?: Ref<HTMLDivElement>): JSX.Element {
           mode={mode}
           date={date}
           onChangePicker={handleChange}
-          renderHeader={mode === 'time' ? undefined : renderHeader}
-          renderFooter={pickScope === 'century' ? undefined : renderFooter}
+          renderHeader={renderHeader}
+          renderFooter={renderFooter}
           renderBody={renderBody}
           onClose={close}
         />

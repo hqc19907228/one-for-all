@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useCallback, memo } from 'react';
 import cs from 'classnames';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -13,10 +13,9 @@ interface Props {
 };
 
 type PickerTimeColumnProps = {
-  data: number[];
+  data: Array<{ value: number, isDisabled: boolean }>;
   pickedTime?: number;
   onChange: (curTime: number) => void;
-  disabledTime: (curTime: number) => boolean;
 };
 
 const HOURS = new Array(24).fill(1).map((val, index) => index);
@@ -38,6 +37,14 @@ export default function RenderTimePicker({
     };
   }, [pickedDate]);
 
+  const { hours, minutes, seconds } = useMemo(() => {
+    return {
+      hours: HOURS.map(hour => ({ value: hour, isDisabled: !!disabledTime?.('hour', hour) })),
+      minutes: MINUTES.map(minute => ({ value: minute, isDisabled: !!disabledTime?.('minute', minute) })),
+      seconds: SECONDS.map(second => ({ value: second, isDisabled: !!disabledTime?.('second', second) }))
+    }
+  }, [disabledTime]);
+
   function handleChange(type: DatePickerTimeAccuracyType, num: number) {
     onChange?.((pickedDate || dayjs().startOf('date')).set(type, num));
   }
@@ -45,32 +52,29 @@ export default function RenderTimePicker({
   return (
     <div className={cs('ofa-pick-time-container', !hasLeftBorder && 'left-border-none')}>
       <PickerTimeColumn
-        data={HOURS}
+        data={hours}
         pickedTime={pickedHour}
         onChange={(time) => handleChange('hour', time)}
-        disabledTime={(time) => !!disabledTime?.('hour', time)}
       />
       {['minute', 'second'].includes(timeAccuracy || '') && (
         <PickerTimeColumn
-          data={MINUTES}
+          data={minutes}
           pickedTime={pickedMinute}
           onChange={(time) => handleChange('minute', time)}
-          disabledTime={(time) => !!disabledTime?.('minute', time)}
         />
       )}
       {timeAccuracy === 'second' && (
         <PickerTimeColumn
-          data={SECONDS}
+          data={seconds}
           pickedTime={pickedSecond}
           onChange={(time) => handleChange('second', time)}
-          disabledTime={(time) => !!disabledTime?.('second', time)}
         />
       )}
     </div>
   );
 }
 
-function PickerTimeColumn({ data, pickedTime, onChange, disabledTime }: PickerTimeColumnProps) {
+function PickerTimeColumn({ data, pickedTime, onChange }: PickerTimeColumnProps) {
   const timeColumnRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,20 +86,13 @@ function PickerTimeColumn({ data, pickedTime, onChange, disabledTime }: PickerTi
 
   return (
     <div className="ofa-pick-time-column" ref={timeColumnRef}>
-      {data.map(item => {
-        if (disabledTime(item)) {
-          return (
-            <span key={item} className="is-disabled">
-              {item}
-            </span>
-          );
-        }
+      {data.map(({ value, isDisabled }) => {
         return (
           <span
-            key={item}
-            className={cs(pickedTime === item && 'is-selected')}
-            onClick={() => onChange(item)}
-          >{item}</span>
+            key={value}
+            className={cs(pickedTime === value && 'is-selected', isDisabled && 'is-disabled')}
+            onClick={() => !isDisabled && onChange(value)}
+          >{value}</span>
         )
       })}
     </div>
