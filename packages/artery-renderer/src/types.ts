@@ -35,6 +35,7 @@ export type NodeProperty =
   | SharedStateProperty
   | NodeStateProperty
   | FunctionalProperty
+  | NodeNestProperty
   | SharedStateMutationProperty
   | APIInvokeProperty
   | RenderProperty
@@ -64,6 +65,10 @@ export interface NodeStateProperty extends Omit<ArterySpec.NodeStateProperty, 'c
 
 export interface FunctionalProperty extends Omit<ArterySpec.FunctionalProperty, 'func'> {
   func: VersatileFunc;
+}
+
+export interface NodeNestProperty extends Omit<ArterySpec.NodeNestProperty, 'value'> {
+  value: NodeProperties | NodeProperties[]
 }
 
 /**
